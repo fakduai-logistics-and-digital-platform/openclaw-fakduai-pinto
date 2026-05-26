@@ -1,0 +1,80 @@
+services:
+  openclaw-gateway:
+    image: ${OPENCLAW_IMAGE:-openclaw-pinto:local}
+    build:
+      context: .
+      args:
+        OPENCLAW_IMAGE: ${OPENCLAW_BASE_IMAGE:-ghcr.io/openclaw/openclaw:latest}
+        PINTO_PLUGIN_REPO: ${PINTO_PLUGIN_REPO:-https://github.com/jatura-fakduai/pinto-openclaw-gateway.git}
+        PINTO_PLUGIN_REF: ${PINTO_PLUGIN_REF:-main}
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      HOME: /home/node
+      OPENCLAW_HOME: /home/node
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
+      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+      PUBLIC_OPENCLAW_URL: ${PUBLIC_OPENCLAW_URL:-}
+      OPENCLAW_DISABLE_BONJOUR: ${OPENCLAW_DISABLE_BONJOUR:-1}
+      PINTO_PLUGIN_AUTO_INSTALL: ${PINTO_PLUGIN_AUTO_INSTALL:-1}
+      PINTO_PLUGIN_AUTO_ENABLE: ${PINTO_PLUGIN_AUTO_ENABLE:-1}
+      TZ: ${OPENCLAW_TZ:-UTC}
+    volumes:
+      - ./openclaw-config:/home/node/.openclaw
+      - ./openclaw-auth:/home/node/.config/openclaw
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+      - "8090:8090"
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  openclaw-cli:
+    image: ${OPENCLAW_IMAGE:-openclaw-pinto:local}
+    build:
+      context: .
+      args:
+        OPENCLAW_IMAGE: ${OPENCLAW_BASE_IMAGE:-ghcr.io/openclaw/openclaw:latest}
+        PINTO_PLUGIN_REPO: ${PINTO_PLUGIN_REPO:-https://github.com/jatura-fakduai/pinto-openclaw-gateway.git}
+        PINTO_PLUGIN_REF: ${PINTO_PLUGIN_REF:-main}
+    network_mode: "service:openclaw-gateway"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      HOME: /home/node
+      OPENCLAW_HOME: /home/node
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
+      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+      PUBLIC_OPENCLAW_URL: ${PUBLIC_OPENCLAW_URL:-}
+      BROWSER: echo
+      PINTO_PLUGIN_AUTO_INSTALL: 0
+      TZ: ${OPENCLAW_TZ:-UTC}
+    volumes:
+      - ./openclaw-config:/home/node/.openclaw
+      - ./openclaw-auth:/home/node/.config/openclaw
+    entrypoint: ["node", "dist/index.js"]
+    depends_on:
+      - openclaw-gateway
+    stdin_open: true
+    tty: true
