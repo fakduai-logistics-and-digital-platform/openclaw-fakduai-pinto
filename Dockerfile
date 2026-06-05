@@ -15,12 +15,20 @@ WORKDIR /src/pinto-app-openclaw
 
 COPY patches/pinto-no-register-config-write.patch /tmp/pinto-no-register-config-write.patch
 
-RUN git clone --depth 1 --branch "${PINTO_PLUGIN_REF}" "${PINTO_PLUGIN_REPO}" . \
-    && git apply /tmp/pinto-no-register-config-write.patch \
+# RUN git clone --depth 1 --branch "${PINTO_PLUGIN_REF}" "${PINTO_PLUGIN_REPO}" . \
+#     && git apply /tmp/pinto-no-register-config-write.patch \
+#     && npm ci \
+#     && npm run build \
+#     && npm pack --pack-destination /tmp \
+#     && cp /tmp/pinto-app-openclaw-*.tgz /tmp/pinto-app-openclaw.tgz
+
+RUN sed -i 's/\r$//' /tmp/pinto-no-register-config-write.patch \
+    && git clone --depth 1 --branch "$PINTO_PLUGIN_REF" "$PINTO_PLUGIN_REPO" . \
+    && git apply --ignore-space-change --ignore-whitespace /tmp/pinto-no-register-config-write.patch \
     && npm ci \
     && npm run build \
-    && npm pack --pack-destination /tmp \
-    && cp /tmp/pinto-app-openclaw-*.tgz /tmp/pinto-app-openclaw.tgz
+    && PKG_FILE="$(npm pack --pack-destination /tmp | tail -n 1)" \
+    && cp "/tmp/${PKG_FILE}" /tmp/pinto-app-openclaw.tgz
 
 FROM ${OPENCLAW_IMAGE}
 
