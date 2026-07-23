@@ -41,6 +41,16 @@ openssl rand -hex 32
 docker compose build
 ```
 
+## 2.1 Guided Onboarding (Optional)
+
+Run the interactive setup to configure auth, models, Gateway, workspace, channels, and skills:
+
+```bash
+docker compose run --rm openclaw-cli onboard
+```
+
+This walks you through login/API keys, model selection, and Gateway settings step by step. You can skip it and configure everything manually in the following sections.
+
 ## 3. Start Local OpenClaw
 
 ```bash
@@ -212,6 +222,7 @@ docker compose -f docker-compose.yml -f docker-compose.trycloudflare.yml logs -f
 Run OpenClaw CLI:
 
 ```bash
+docker compose run --rm openclaw-cli onboard
 docker compose run --rm openclaw-cli plugins list
 docker compose run --rm openclaw-cli channels list
 docker compose run --rm openclaw-cli config validate
