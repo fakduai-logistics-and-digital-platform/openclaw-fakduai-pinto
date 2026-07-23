@@ -5,8 +5,7 @@ services:
       context: .
       args:
         OPENCLAW_IMAGE: ${OPENCLAW_BASE_IMAGE:-ghcr.io/openclaw/openclaw:latest}
-        PINTO_PLUGIN_REPO: ${PINTO_PLUGIN_REPO:-https://github.com/jatura-fakduai/pinto-openclaw-gateway.git}
-        PINTO_PLUGIN_REF: ${PINTO_PLUGIN_REF:-main}
+        PINTO_PLUGIN_VERSION: ${PINTO_PLUGIN_VERSION:-latest}
     env_file:
       - path: .env
         required: false
@@ -52,8 +51,7 @@ services:
       context: .
       args:
         OPENCLAW_IMAGE: ${OPENCLAW_BASE_IMAGE:-ghcr.io/openclaw/openclaw:latest}
-        PINTO_PLUGIN_REPO: ${PINTO_PLUGIN_REPO:-https://github.com/jatura-fakduai/pinto-openclaw-gateway.git}
-        PINTO_PLUGIN_REF: ${PINTO_PLUGIN_REF:-main}
+        PINTO_PLUGIN_VERSION: ${PINTO_PLUGIN_VERSION:-latest}
     network_mode: "service:openclaw-gateway"
     env_file:
       - path: .env

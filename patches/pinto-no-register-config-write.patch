@@ -1,59 +1,50 @@
-diff --git a/src/index.ts b/src/index.ts
-index 4f9d4b4..9b49d29 100644
---- a/src/index.ts
-+++ b/src/index.ts
-@@ -1,9 +1,5 @@
- import type { OpenClawPluginApi } from "openclaw/plugin-sdk/core";
--import {
--  buildDefaultPintoChannelConfig,
--  pintoPlugin,
--  setPintoRuntime,
--} from "./channel.js";
-+import { pintoPlugin, setPintoRuntime } from "./channel.js";
- 
+--- a/package/dist/index.js	2026-07-24 01:01:15
++++ b/package/dist/index.js	2026-07-24 01:01:15
+@@ -1,39 +1,11 @@
+-import { buildDefaultPintoChannelConfig, pintoPlugin, setPintoRuntime, } from "./channel.js";
++import { pintoPlugin, setPintoRuntime, } from "./channel.js";
  const plugin = {
-   id: "pinto-app-openclaw",
-@@ -12,43 +8,9 @@ const plugin = {
- 
-   register(api: OpenClawPluginApi) {
-     const logger = (api.runtime as any)?.logger;
--    const runtimeConfig = (api.runtime as any)?.config;
- 
-     setPintoRuntime(api.runtime as any);
- 
--    try {
--      const currentCfg = runtimeConfig?.loadConfig?.();
--      if (
--        currentCfg &&
--        typeof currentCfg === "object" &&
--        !Array.isArray(currentCfg)
--      ) {
--        const typedCfg = currentCfg as Record<string, any>;
--        const currentChannels =
--          typedCfg.channels &&
--          typeof typedCfg.channels === "object" &&
--          !Array.isArray(typedCfg.channels)
--            ? typedCfg.channels
--            : {};
--
--        if (!currentChannels.pinto) {
--          const nextCfg = {
--            ...typedCfg,
--            channels: {
--              ...currentChannels,
--              pinto: buildDefaultPintoChannelConfig(),
--            },
--          };
--          void runtimeConfig?.writeConfigFile?.(nextCfg);
--          logger?.info("Pinto Chat Plugin initialized default channels.pinto config");
+     id: "pinto-app-openclaw",
+     name: "Pinto Chat",
+     description: "Plugin to connect Pinto Chat with OpenClaw AI Agents",
+     register(api) {
+         const logger = api.runtime?.logger;
+-        const runtimeConfig = api.runtime?.config;
+         setPintoRuntime(api.runtime);
+-        try {
+-            const currentCfg = runtimeConfig?.loadConfig?.();
+-            if (currentCfg &&
+-                typeof currentCfg === "object" &&
+-                !Array.isArray(currentCfg)) {
+-                const typedCfg = currentCfg;
+-                const currentChannels = typedCfg.channels &&
+-                    typeof typedCfg.channels === "object" &&
+-                    !Array.isArray(typedCfg.channels)
+-                    ? typedCfg.channels
+-                    : {};
+-                if (!currentChannels.pinto) {
+-                    const nextCfg = {
+-                        ...typedCfg,
+-                        channels: {
+-                            ...currentChannels,
+-                            pinto: buildDefaultPintoChannelConfig(),
+-                        },
+-                    };
+-                    void runtimeConfig?.writeConfigFile?.(nextCfg);
+-                    logger?.info("Pinto Chat Plugin initialized default channels.pinto config");
+-                }
+-            }
 -        }
--      }
--    } catch (error) {
--      logger?.error?.(
--        `Pinto Chat Plugin failed to initialize default config: ${error instanceof Error ? error.message : String(error)}`,
--      );
--    }
--
-     api.registerChannel({
-       plugin: pintoPlugin,
-     });
+-        catch (error) {
+-            logger?.error?.(`Pinto Chat Plugin failed to initialize default config: ${error instanceof Error ? error.message : String(error)}`);
+-        }
+         api.registerChannel({
+             plugin: pintoPlugin,
+         });
+@@ -41,4 +13,4 @@
+     },
+ };
+ export default plugin;
+-//# sourceMappingURL=index.js.map
+\ No newline at end of file
++//# sourceMappingURL=index.js.map

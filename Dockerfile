@@ -2,33 +2,23 @@ ARG OPENCLAW_IMAGE=ghcr.io/openclaw/openclaw:latest
 
 FROM node:24-bookworm-slim AS plugin-build
 
-ARG PINTO_PLUGIN_REPO=https://github.com/jatura-fakduai/pinto-openclaw-gateway.git
-ARG PINTO_PLUGIN_REF=main
+ARG PINTO_PLUGIN_VERSION=latest
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
       ca-certificates \
-      git \
+      patch \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src/pinto-app-openclaw
 
 COPY patches/pinto-no-register-config-write.patch /tmp/pinto-no-register-config-write.patch
 
-# RUN git clone --depth 1 --branch "${PINTO_PLUGIN_REF}" "${PINTO_PLUGIN_REPO}" . \
-#     && git apply /tmp/pinto-no-register-config-write.patch \
-#     && npm ci \
-#     && npm run build \
-#     && npm pack --pack-destination /tmp \
-#     && cp /tmp/pinto-app-openclaw-*.tgz /tmp/pinto-app-openclaw.tgz
-
-RUN sed -i 's/\r$//' /tmp/pinto-no-register-config-write.patch \
-    && git clone --depth 1 --branch "$PINTO_PLUGIN_REF" "$PINTO_PLUGIN_REPO" . \
-    && git apply --ignore-space-change --ignore-whitespace /tmp/pinto-no-register-config-write.patch \
-    && npm ci \
-    && npm run build \
-    && PKG_FILE="$(npm pack --pack-destination /tmp | tail -n 1)" \
-    && cp "/tmp/${PKG_FILE}" /tmp/pinto-app-openclaw.tgz
+RUN npm pack "pinto-app-openclaw@${PINTO_PLUGIN_VERSION}" --pack-destination /tmp \
+    && PKG_FILE="$(ls /tmp/pinto-app-openclaw-*.tgz | head -n 1)" \
+    && tar -xzf "$PKG_FILE" \
+    && patch -p1 < /tmp/pinto-no-register-config-write.patch \
+    && tar -czf /tmp/pinto-app-openclaw.tgz package/
 
 FROM ${OPENCLAW_IMAGE}
 
