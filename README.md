@@ -331,6 +331,32 @@ Usually fix:
 docker compose restart openclaw-gateway
 ```
 
+### Windows: `can't join network of container`
+
+Use the current `docker-compose.yml`, where `openclaw-cli` joins the regular
+Compose network and connects to `ws://openclaw-gateway:18789`. Then recreate
+both services:
+
+```powershell
+docker compose down
+docker compose up -d --build
+```
+
+Also make sure `.env` exists and contains a non-empty
+`OPENCLAW_GATEWAY_TOKEN`. In PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+If the network error is gone and the next message is `device pairing required`,
+approve the pending CLI device from inside the running gateway:
+
+```powershell
+docker compose exec openclaw-gateway node dist/index.js devices list
+docker compose exec openclaw-gateway node dist/index.js devices approve DEVICE_ID
+```
+
 ### Pinto webhook returns `not found`
 
 The Pinto channel is not fully configured yet.
