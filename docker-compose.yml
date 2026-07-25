@@ -45,39 +45,39 @@ services:
       retries: 5
       start_period: 30s
 
-  openclaw-cli:
-    image: ${OPENCLAW_IMAGE:-openclaw-pinto:local}
-    build:
-      context: .
-      args:
-        OPENCLAW_IMAGE: ${OPENCLAW_BASE_IMAGE:-ghcr.io/openclaw/openclaw:latest}
-        PINTO_PLUGIN_VERSION: ${PINTO_PLUGIN_VERSION:-latest}
-    env_file:
-      - path: .env
-        required: false
-    environment:
-      HOME: /home/node
-      OPENCLAW_HOME: /home/node
-      OPENCLAW_STATE_DIR: /home/node/.openclaw
-      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
-      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
-      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
-      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
-      OPENCLAW_GATEWAY_URL: ws://openclaw-gateway:18789
-      # This connection stays inside Docker's private Compose network.
-      OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: 1
-      PUBLIC_OPENCLAW_URL: ${PUBLIC_OPENCLAW_URL:-}
-      BROWSER: echo
-      PINTO_PLUGIN_AUTO_INSTALL: 0
-      TZ: ${OPENCLAW_TZ:-UTC}
-    volumes:
-      - ./openclaw-config:/home/node/.openclaw
-      - ./openclaw-auth:/home/node/.config/openclaw
-    entrypoint: ["node", "dist/index.js"]
-    depends_on:
-      openclaw-gateway:
-        condition: service_healthy
-    healthcheck:
-      disable: true
-    stdin_open: true
-    tty: true
+  # openclaw-cli:
+  #   image: ${OPENCLAW_IMAGE:-openclaw-pinto:local}
+  #   build:
+  #     context: .
+  #     args:
+  #       OPENCLAW_IMAGE: ${OPENCLAW_BASE_IMAGE:-ghcr.io/openclaw/openclaw:latest}
+  #       PINTO_PLUGIN_VERSION: ${PINTO_PLUGIN_VERSION:-latest}
+  #   env_file:
+  #     - path: .env
+  #       required: false
+  #   environment:
+  #     HOME: /home/node
+  #     OPENCLAW_HOME: /home/node
+  #     OPENCLAW_STATE_DIR: /home/node/.openclaw
+  #     OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
+  #     OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+  #     OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+  #     OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-}
+  #     OPENCLAW_GATEWAY_URL: ws://openclaw-gateway:18789
+  #     # This connection stays inside Docker's private Compose network.
+  #     OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: 1
+  #     PUBLIC_OPENCLAW_URL: ${PUBLIC_OPENCLAW_URL:-}
+  #     BROWSER: echo
+  #     PINTO_PLUGIN_AUTO_INSTALL: 0
+  #     TZ: ${OPENCLAW_TZ:-UTC}
+  #   volumes:
+  #     - ./openclaw-config:/home/node/.openclaw
+  #     - ./openclaw-auth:/home/node/.config/openclaw
+  #   entrypoint: ["node", "dist/index.js"]
+  #   depends_on:
+  #     openclaw-gateway:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     disable: true
+  #   stdin_open: true
+  #   tty: true
