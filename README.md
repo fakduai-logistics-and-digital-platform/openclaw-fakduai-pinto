@@ -256,13 +256,16 @@ docs/agent-communication.md
 
 Reset login token:
 
-1. Edit `.env`.
-2. Change `OPENCLAW_GATEWAY_TOKEN`.
-3. Rebuild and restart:
+1. Generate a new token:
 
 ```bash
-docker compose build
-docker compose up -d
+sh scripts/reset-login-token.sh
+```
+
+2. Recreate the gateway so Docker Compose reloads `.env`:
+
+```bash
+docker compose up -d --force-recreate openclaw-gateway
 ```
 
 Reset all OpenClaw config and auth:

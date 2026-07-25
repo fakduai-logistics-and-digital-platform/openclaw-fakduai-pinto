@@ -34,7 +34,7 @@ mv "$tmp" "$ENV_FILE"
 echo "New OpenClaw Web UI login token:"
 echo "$token"
 echo
-echo "Restart the gateway:"
-echo "  docker compose restart openclaw-gateway"
+echo "Recreate the gateway so Docker Compose reloads .env:"
+echo "  docker compose up -d --force-recreate openclaw-gateway"
 echo
 echo "Then reload the browser and paste the token above."
